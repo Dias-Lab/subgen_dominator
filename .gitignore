@@ -3,6 +3,8 @@ inputData/
 *.csv
 *.fa
 *.fasta
+# Exception: processed feature sets needed for reproducibility
+!final_featuresets/*.csv
 
 # Ignore Jupyter/Python temp files
 .ipynb_checkpoints/
