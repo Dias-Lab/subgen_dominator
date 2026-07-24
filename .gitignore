@@ -1,0 +1,10 @@
+# Ignore data files
+inputData/
+*.csv
+*.fa
+*.fasta
+
+# Ignore Jupyter/Python temp files
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
