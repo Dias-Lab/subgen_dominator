@@ -1,10 +1,12 @@
 # Ignore data files
-inputData/
+inputData/*
 *.csv
 *.fa
 *.fasta
 # Exception: processed feature sets needed for reproducibility
 !final_featuresets/*.csv
+# Exception: placeholder README pointing to Zenodo archive
+!inputData/README.md
 
 # Ignore Jupyter/Python temp files
 .ipynb_checkpoints/
