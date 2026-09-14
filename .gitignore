@@ -8,6 +8,9 @@ inputData/*
 # Exception: placeholder README pointing to Zenodo archive
 !inputData/README.md
 
+# Ignore local, regenerable analysis outputs (not pipeline inputs)
+maize_outputs/
+
 # Ignore Jupyter/Python temp files
 .ipynb_checkpoints/
 __pycache__/

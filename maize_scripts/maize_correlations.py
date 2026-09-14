@@ -3,13 +3,13 @@ Spearman correlation analysis for maize subgenome dominance feature matrices.
 
 USAGE
 -----
-Set GROUP as an environment variable before running:
-    export GROUP="All"   # or "I", "II", "III", "IV"
-    python maize_correlations.py
+    python maize_correlations.py <GROUP>
 
 Valid GROUP values: "All", "I", "II", "III", "IV"
 
-OUTPUTS (per group, all filenames include group identifier)
+OUTPUTS (per group, all filenames include group identifier; written to
+maize_outputs/corr_output/, kept local — regenerable from final_featuresets/
+and not tracked in git)
 -------
 Text files:
     corr_{GROUP}_pairwise_r0.3.txt       — all pairs with |r| >= 0.3
@@ -38,8 +38,9 @@ USE_LOCATION (controlled by GROUP):
   - Groups I-IV: location excluded (n = 59 features)
 """
 
-import os
+import sys
 import warnings
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,31 +57,28 @@ warnings.filterwarnings("ignore", category=UserWarning)
 # CONFIGURATION
 # ============================================================
 
-GROUP = "IV"  # or "I", "II", "III", "IV"
+FEATURESETS_DIR = Path("../final_featuresets")
+OUTPUT_DIR = Path("../maize_outputs/corr_output")
 
 INPUT_PATHS = {
-    "All": "/blue/meixiazhao/laylaaschuster/maizeGDM/final_maizeMLpreprocess/"
-            "final_featuresets/processedMaize_final.csv",
-    "I":   "/blue/meixiazhao/laylaaschuster/maizeGDM/final_maizeMLpreprocess/"
-            "final_featuresets/processedMaize_groupI_final.csv",
-    "II":  "/blue/meixiazhao/laylaaschuster/maizeGDM/final_maizeMLpreprocess/"
-            "final_featuresets/processedMaize_groupII_final.csv",
-    "III": "/blue/meixiazhao/laylaaschuster/maizeGDM/final_maizeMLpreprocess/"
-            "final_featuresets/processedMaize_groupIII_final.csv",
-    "IV":  "/blue/meixiazhao/laylaaschuster/maizeGDM/final_maizeMLpreprocess/"
-            "final_featuresets/processedMaize_groupIV_final.csv",
+    "All": FEATURESETS_DIR / "processedMaize_final.csv",
+    "I":   FEATURESETS_DIR / "processedMaize_groupI_final.csv",
+    "II":  FEATURESETS_DIR / "processedMaize_groupII_final.csv",
+    "III": FEATURESETS_DIR / "processedMaize_groupIII_final.csv",
+    "IV":  FEATURESETS_DIR / "processedMaize_groupIV_final.csv",
 }
 
-OUTPUT_DIR = "/blue/meixiazhao/laylaaschuster/maizeGDM/final_maizeMLpreprocess/feature_correlations"
+if len(sys.argv) != 2 or sys.argv[1] not in INPUT_PATHS:
+    print(f"Usage: python maize_correlations.py <GROUP>")
+    print(f"Valid GROUP values: {list(INPUT_PATHS.keys())}")
+    sys.exit(1)
+
+GROUP = sys.argv[1]
 
 # location is included only for the All model
 USE_LOCATION = (GROUP == "All")
 
-assert GROUP in INPUT_PATHS, (
-    f"Invalid GROUP '{GROUP}'. Valid values: {list(INPUT_PATHS.keys())}"
-)
-
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 input_path = INPUT_PATHS[GROUP]
 
 print("=" * 60)
@@ -247,7 +245,7 @@ df_03 = (pd.DataFrame(rows)
            .reset_index(drop=True))
 df_03["p_value"] = df_03["p_value"].map(lambda x: f"{x:.2e}")
 
-path_03 = os.path.join(OUTPUT_DIR, f"corr_{GROUP}_pairwise_r0.3.txt")
+path_03 = OUTPUT_DIR / f"corr_{GROUP}_pairwise_r0.3.txt"
 df_03.to_csv(path_03, sep="\t", index=False)
 print(f"  {len(df_03):>5} pairs |r|>=0.3  -> {path_03}")
 
@@ -256,7 +254,7 @@ print(f"  {len(df_03):>5} pairs |r|>=0.3  -> {path_03}")
 # ============================================================
 
 df_05 = df_03[df_03["Spearman_r"].abs() >= 0.5].copy()
-path_05 = os.path.join(OUTPUT_DIR, f"corr_{GROUP}_pairwise_r0.5.txt")
+path_05 = OUTPUT_DIR / f"corr_{GROUP}_pairwise_r0.5.txt"
 df_05.to_csv(path_05, sep="\t", index=False)
 print(f"  {len(df_05):>5} pairs |r|>=0.5  -> {path_05}")
 
@@ -279,7 +277,7 @@ re_df = pd.DataFrame({
 # Sort by absolute correlation magnitude, descending
 re_df = re_df.iloc[re_df["Spearman_r"].abs().argsort()[::-1]].reset_index(drop=True)
 
-path_re = os.path.join(OUTPUT_DIR, f"corr_{GROUP}_Re_vs_all_features.txt")
+path_re = OUTPUT_DIR / f"corr_{GROUP}_Re_vs_all_features.txt"
 re_df.to_csv(path_re, sep="\t", index=False)
 print(f"  {len(re_df):>5} features         -> {path_re}")
 print(f"\n  Re: {re_df['Significant_Bonferroni'].sum()} / {len(re_df)} features "
@@ -352,7 +350,7 @@ cg.figure.suptitle(
     fontsize=13, fontweight="bold", y=1.01
 )
 
-heatmap_path = os.path.join(OUTPUT_DIR, f"corr_{GROUP}_heatmap.png")
+heatmap_path = OUTPUT_DIR / f"corr_{GROUP}_heatmap.png"
 cg.figure.savefig(heatmap_path, dpi=600, bbox_inches="tight")
 plt.close(cg.figure)
 print(f"Saved: {heatmap_path}")
@@ -420,7 +418,7 @@ ax.text(
 
 plt.tight_layout()
 
-barplot_path = os.path.join(OUTPUT_DIR, f"corr_{GROUP}_Re_barplot.png")
+barplot_path = OUTPUT_DIR / f"corr_{GROUP}_Re_barplot.png"
 plt.savefig(barplot_path, dpi=600, bbox_inches="tight")
 plt.close()
 print(f"Saved: {barplot_path}")
