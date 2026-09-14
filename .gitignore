@@ -10,6 +10,7 @@ inputData/*
 
 # Ignore local, regenerable analysis outputs (not pipeline inputs)
 maize_outputs/
+brassica_outputs/
 
 # Ignore Jupyter/Python temp files
 .ipynb_checkpoints/
