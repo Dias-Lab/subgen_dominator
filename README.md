@@ -11,6 +11,7 @@ in two independent polyploid systems, maize (*Zea mays*) and *Brassica rapa*,
 and to interpret the resulting models using SHAP-based XAI methods.
 
 ## Repository Structure
+```bash
 subgen_dominator/
 ├── maize_scripts/ Maize analysis pipeline
 │ ├── feature_preprocessing/ Per-feature preprocessing scripts (GC content, expression, ACR)
@@ -25,6 +26,7 @@ subgen_dominator/
 ├── brassica_outputs/ Local, regenerable analysis outputs (gitignored — see below)
 ├── requirements.txt
 └── README.md
+```
 
 ## Data Availability
 
@@ -37,9 +39,11 @@ Raw and intermediate feature-source files for both species are archived on Zenod
 2. Extract its contents into the `inputData/` folder at the repository root,
    preserving the folder names below.
    
+```bash 
 inputData/
 ├── maize_inputData/ Raw/intermediate feature files for maize
 └── brapa_inputData/ Raw/intermediate feature files for B. rapa
+```
 
 See `inputData/README.md` for the full expected structure.
 
